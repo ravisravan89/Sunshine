@@ -3,9 +3,9 @@ package com.ravisravan.sunshine;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -13,54 +13,50 @@ import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.ravisravan.sunshine.data.WeatherContract;
 import com.ravisravan.sunshine.gcm.RegistrationIntentService;
 import com.ravisravan.sunshine.sync.SunshineSyncAdapter;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
 
-    private String mLocation;
-    private boolean mTwoPane;
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private boolean mTwoPane;
+    private String mLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocation = Utility.getPreferredLocation(this);
-        Log.e("main", "main");
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         if (findViewById(R.id.weather_detail_container) != null) {
-            //The detail container view will be present only in the large screen layouts,
-            //If this view is present then activty should be in two pane mode,
-            //so this should be true.
+            // The detail container view will be present only in the large-screen layouts
+            // (res/layout-sw600dp). If this view is present, then the activity should be
+            // in two-pane mode.
             mTwoPane = true;
-            //In two pane mode show detail view in this activity by adding or replacing details fragment.
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
             if (savedInstanceState == null) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.weather_detail_container, new DetailActivityFragment(), DETAILFRAGMENT_TAG)
                         .commit();
-
             }
         } else {
             mTwoPane = false;
             getSupportActionBar().setElevation(0f);
         }
 
-        ForecastFragment forecastFragment = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-        if(forecastFragment!=null){
-            forecastFragment.setUseTodayLayout(!mTwoPane);
-        }
+        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_forecast));
+        forecastFragment.setUseTodayLayout(!mTwoPane);
+
         SunshineSyncAdapter.initializeSyncAdapter(this);
 
         // If Google Play Services is up to date, we'll want to register GCM. If it is not, we'll
@@ -81,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         }
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -98,32 +93,11 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(settingsIntent);
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-//        } else if (id == R.id.action_view_location) {
-//            String location = Utility.getPreferredLocation(this);
-//            Uri geoLocation = null;
-//            try {
-//                geoLocation = Uri.parse("geo:0,0?").buildUpon()
-//                        .appendQueryParameter("q", URLEncoder.encode(location, "UTF-8"))
-//                        .build();
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-//            showMap(geoLocation);
-//        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void showMap(Uri geoLocation) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(geoLocation);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
     }
 
     @Override
@@ -145,30 +119,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v("Life cycle", "onStart");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.v("Life cycle", "onPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.v("Life cycle", "onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.v("Life cycle", "onDestroy");
-    }
-
-    @Override
     public void onItemSelected(Uri contentUri) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
@@ -183,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
-
         } else {
             Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);
