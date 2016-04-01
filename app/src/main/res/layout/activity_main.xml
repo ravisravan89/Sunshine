@@ -10,11 +10,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
  -->
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -28,7 +27,7 @@
             android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/primary"
             android:scaleType="center"
-            android:src="@drawable/ic_logo" />
+            android:src="@drawable/ic_logo"/>
     </android.support.v7.widget.Toolbar>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,6 +36,5 @@
         android:name="com.ravisravan.sunshine.ForecastFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.ravisravan.sunshine.ForecastFragment"
         tools:layout="@android:layout/list_content" />
-</LinearLayout>
+</FrameLayout>
