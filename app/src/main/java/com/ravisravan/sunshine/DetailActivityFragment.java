@@ -3,6 +3,7 @@ package com.ravisravan.sunshine;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -44,6 +45,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     public static final int COL_WEATHER_DEGREES = 8;
     public static final int COL_WEATHER_CONDITION_ID = 9;
     static final String DETAIL_URI = "URI";
+    static final String DETAIL_TRANSITION_ANIMATION = "DTA";
     private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
     private static final int DETAIL_LOADER = 0;
@@ -62,6 +64,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             // weather data, even though they're stored in two different tables.
             WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING
     };
+    private boolean mTransitionAnimation;
     private String mForecast;
     private Uri mUri;
     private ImageView mIconView;
@@ -87,6 +90,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailActivityFragment.DETAIL_URI);
+            mTransitionAnimation = arguments.getBoolean(DetailActivityFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail_start, container, false);
@@ -108,6 +112,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         // Retrieve the share menu item
         MenuItem menuItem = menu.findItem(R.id.action_share);
         menuItem.setIntent(createShareForecastIntent());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getActivity().finishAfterTransition();
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -244,7 +260,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
         // We need to start the enter transition after the data has loaded
-        if (activity instanceof DetailActivity) {
+        if (mTransitionAnimation) {
             activity.supportStartPostponedEnterTransition();
 
             if (null != toolbarView) {
