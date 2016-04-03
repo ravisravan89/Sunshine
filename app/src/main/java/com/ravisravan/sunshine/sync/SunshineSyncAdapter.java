@@ -64,6 +64,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             LOCATION_STATUS_UNKNOWN = 3;
     public static final int
             LOCATION_STATUS_INVALID = 4;
+    public static final String ACTION_DATA_UPDATED =
+            "com.ravisravan.sunshine.ACTION_DATA_UPDATED";
     private static final String[] NOTIFY_WEATHER_PROJECTION = new String[]{
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
@@ -456,6 +458,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 //                getContext().getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
 //                        WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
 //                        new String[]{yesterdayDate});
+                updateWidgets();
                 notifyWeather();
             }
 
@@ -522,6 +525,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     private void setLocationStatus(Context c, @LocationStatus int locationStatus) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         prefs.edit().putInt(c.getString(R.string.pref_location_status_key), locationStatus).commit();
+    }
+
+    private void updateWidgets() {
+        Context context = getContext();
+        // Setting the package ensures that only components in our app will receive the broadcast
+        Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                .setPackage(context.getPackageName());
+        context.sendBroadcast(dataUpdatedIntent);
     }
 
     private void notifyWeather() {
