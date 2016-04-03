@@ -38,6 +38,29 @@ public class Utility {
     // back into date objects for comparison/processing.
     public static final String DATE_FORMAT = "yyyyMMdd";
 
+    // We'll default our latlong to 0. Yay, "Earth!"
+    public static float DEFAULT_LATLONG = 0F;
+
+    public static boolean isLocationLatLonAvailable(Context context) {
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.contains(context.getString(R.string.pref_location_latitude)) && prefs.contains(context.getString(R.string.pref_location_longitude));
+    }
+
+    public static float getLocationLatitude(Context context) {
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getFloat(context.getString(R.string.pref_location_latitude), DEFAULT_LATLONG);
+    }
+
+    public static float getLocationLongitude(Context context) {
+        SharedPreferences prefs
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getFloat(context.getString(R.string.pref_location_longitude),
+                DEFAULT_LATLONG);
+    }
+
+
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_location_key),
@@ -226,7 +249,8 @@ public class Utility {
     /**
      * Helper method to provide the string according to the weather
      * condition id returned by the OpenWeatherMap call.
-     * @param context Android context
+     *
+     * @param context   Android context
      * @param weatherId from OpenWeatherMap API response
      * @return string for the weather condition. null if no relation is found.
      */
@@ -402,14 +426,14 @@ public class Utility {
     }
 
 
-        /**
-         * Helper method to provide the art urls according to the weather condition id returned
-         * by the OpenWeatherMap call.
-         *
-         * @param context Context to use for retrieving the URL format
-         * @param weatherId from OpenWeatherMap API response
-         * @return url for the corresponding weather artwork. null if no relation is found.
-         */
+    /**
+     * Helper method to provide the art urls according to the weather condition id returned
+     * by the OpenWeatherMap call.
+     *
+     * @param context   Context to use for retrieving the URL format
+     * @param weatherId from OpenWeatherMap API response
+     * @return url for the corresponding weather artwork. null if no relation is found.
+     */
     public static String getArtUrlForWeatherCondition(Context context, int weatherId) {
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
@@ -450,7 +474,7 @@ public class Utility {
      * Helper method to convert the database representation of the date into something to display
      * to users.  As classy and polished a user experience as "20140102" is, we can do better.
      *
-     * @param context Context to use for resource localization
+     * @param context      Context to use for resource localization
      * @param dateInMillis The date in milliseconds
      * @return a user-friendly representation of the date.
      */
